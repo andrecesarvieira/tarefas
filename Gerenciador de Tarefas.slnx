@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="UbiquitousLanguage.md" />
+  </Folder>
+  <Project Path="GerenciadorTarefas.Application/GerenciadorTarefas.Application.csproj" />
+  <Project Path="GerenciadorTarefas.Domain/GerenciadorTarefas.Domain.csproj" />
+  <Project Path="GerenciadorTarefas.Infrastructure/GerenciadorTarefas.Infrastructure.csproj" />
+  <Project Path="GerenciadorTarefas.Tests/GerenciadorTarefas.Tests.csproj" />
+</Solution>
