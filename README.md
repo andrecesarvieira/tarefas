@@ -359,8 +359,6 @@ graph TB
 
 ## Critérios de Avaliação
 
-Esta seção mapeia cada critério de avaliação para a implementação no código-fonte. **Coloque os links do GitHub na coluna "Link do Código"**.
-
 ### 1. Orientação a Objetos com C\#
 
 | #       | Critério                   | Descrição                                                                                                                             | Link do Código                                                                                                                                  |
