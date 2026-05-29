@@ -1,5 +1,7 @@
 # 📋 Gerenciador de Tarefas
 
+**Repositório no GitHub:** [andrecesarvieira/tarefas](https://github.com/andrecesarvieira/tarefas)
+
 ## 🔎 Índice
 
 1. [Descrição do Projeto](#descrição-do-projeto)
