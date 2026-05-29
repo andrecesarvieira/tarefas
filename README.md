@@ -11,7 +11,7 @@
 7. [Regras de Negócio](#regras-de-negócio)
 8. [Testes Unitários](#testes-unitários)
 9. [Diagrama da Arquitetura DDD](#diagrama-da-arquitetura-ddd)
-10. [Critérios de Avaliação](#critérios-de-avaliação)
+10. [Critérios de Avaliação (Rubrica)](#critérios-de-avaliação)
 
 ---
 
