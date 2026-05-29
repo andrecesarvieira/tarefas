@@ -256,101 +256,81 @@ A aplicação inclui **8 testes unitários** cobrindo todos os cenários de neg�
 
 ## 📊 Diagrama da Arquitetura DDD
 
-```plantuml
-@startuml modelagem-ddd
-
-!define ACCENT_COLOR #1976d2
-!define ENTITY_COLOR #fff3e0
-
-skinparam backgroundColor #fafafa
-skinparam classBackgroundColor #fff3e0
-skinparam classBorderColor #333
-skinparam fontSize 11
-skinparam linetype ortho
-
-package "CONTEXTO: TAREFAS" #e3f2fd {
-
-    abstract class Entity {
-        #id: Guid
-        --
-        +Equals()
-        +GetHashCode()
-    }
-
-    class Tarefa {
-        -titulo: string
-        -descricao: string
-        -concluida: bool
-        -prazo: Prazo
-        -prioridade: Prioridade
-        --
-        +Validar()
-        +Concluir()
-    }
-
-    class Prazo {
-        -data: DateTime
-        --
-        +Validar()
-    }
-
-    class Prioridade {
-        -nivel: NivelPrioridade
-    }
-
-    class TarefaFactory {
-        +CriarTarefa(): Tarefa
-    }
-
-    class ServicoDeConclusao {
-        +ConcluirTarefa(): Task
-    }
-
-    interface ITarefaRepository {
-        +ObterPorId()
-        +Adicionar()
-        +Atualizar()
-        +Remover()
-    }
-
-    Entity <|-- Tarefa
-    Entity <|-- Prazo
-    Entity <|-- Prioridade
-
-    Tarefa *-- Prazo
-    Tarefa *-- Prioridade
-
-    TarefaFactory --> Tarefa
-    ServicoDeConclusao --> ITarefaRepository
-}
-
-package "CONTEXTO: NOTIFICAÇÕES" #e8f5e9 {
-
-    class TarefaAdapter {
-        +AdaptarTarefa(): DTO
-    }
-
-    class TarefaVencendoDTO {
-        -id: Guid
-        -titulo: string
-        -dataVencimento: DateTime
-    }
-
-    TarefaAdapter --> TarefaVencendoDTO
-}
-
-Tarefa -.-> TarefaAdapter : ACL
-
-@enduml
+```mermaid
+graph TB
+    subgraph Tarefas["CONTEXTO: TAREFAS"]
+        Entity["<b>Entity</b><br/>─────<br/>■ Id: Guid<br/>─────<br/>+ Equals()<br/>+ GetHashCode()"]
+        
+        Tarefa["<b>Tarefa</b><br/><i>(Aggregate Root)</i><br/>─────<br/>■ Titulo: string<br/>■ Descricao: string<br/>■ Concluida: bool<br/>■ UsuarioId: Guid<br/>■ Prazo: Prazo<br/>■ Prioridade: Prioridade<br/>─────<br/>+ Validar()<br/>+ Concluir()"]
+        
+        Usuario["<b>Usuario</b><br/><i>(Entity)</i><br/>─────<br/>■ Nome: string<br/>─────<br/>+ Validar()"]
+        
+        Prazo["<b>Prazo</b><br/><i>(Value Object)</i><br/>─────<br/>■ Data: DateTime<br/>─────<br/>+ Validar()<br/>+ Equals()"]
+        
+        Prioridade["<b>Prioridade</b><br/><i>(Value Object)</i><br/>─────<br/>■ Nivel: enum<br/>─────<br/>+ Equals()"]
+        
+        Factory["<b>TarefaFactory</b><br/><i>(Factory)</i><br/>─────<br/>+ CriarTarefa()"]
+        
+        Service["<b>ServicoDeConclusao</b><br/><i>(Domain Service)</i><br/>─────<br/>+ ConcluirTarefa()"]
+        
+        Repository["<b>ITarefaRepository</b><br/><i>interface</i><br/>─────<br/>+ ObterPorId()<br/>+ Adicionar()<br/>+ Atualizar()<br/>+ Remover()"]
+        
+        Entity -->|herança| Tarefa
+        Entity -->|herança| Usuario
+        Entity -->|herança| Prazo
+        Entity -->|herança| Prioridade
+        
+        Tarefa -->|contém| Prazo
+        Tarefa -->|contém| Prioridade
+        
+        Factory -->|cria| Tarefa
+        Service -->|usa| Repository
+        Service -->|opera| Tarefa
+    end
+    
+    subgraph Notificacoes["CONTEXTO: NOTIFICAÇÕES"]
+        Adapter["<b>TarefaAdapter</b><br/><i>(Anti-Corruption Layer)</i><br/>─────<br/>+ AdaptarTarefa()"]
+        
+        DTO["<b>TarefaVencendoDTO</b><br/><i>(DTO)</i><br/>─────<br/>■ Id: Guid<br/>■ Titulo: string<br/>■ DataVencimento: DateTime"]
+        
+        Adapter -->|traduz em| DTO
+    end
+    
+    Tarefa -.->|ACL| Adapter
+    
+    style Entity fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Tarefa fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Usuario fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Prazo fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Prioridade fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Factory fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style Service fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style Repository fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style Adapter fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    style DTO fill:#ffe0b2,stroke:#e65100,stroke-width:2px
+    style Tarefas fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style Notificacoes fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
 ```
 
-**Componentes principais:**
-- **Entities:** Objetos com identidade única (Id)
-- **Value Objects:** Objetos imutáveis comparados por valor (Prazo, Prioridade)
-- **Aggregates:** Tarefa (Aggregate Root) contém seus Value Objects
-- **Factories:** TarefaFactory cria novas tarefas
-- **Domain Services:** ServicoDeConclusao orquestra operações complexas
-- **Repositories:** ITarefaRepository abstrai a persistência
-- **Anti-Corruption Layer:** TarefaAdapter desacopla os Bounded Contexts
+### Legenda de Componentes
+
+| Cor | Componente | Descrição |
+|-----|-----------|-----------|
+| 🟧 Laranja | **Entities** | Objetos com identidade única (Id). Comparados pelo Id. |
+| 🟪 Roxo | **Value Objects** | Objetos imutáveis comparados por valor (Prazo, Prioridade). |
+| 🟩 Verde | **Factories** | Padrão criador. Responsabilidade: CRIAR agregados. |
+| 🟥 Rosa | **Domain Services** | Padrão orquestrador. Responsabilidade: OPERAR sobre agregados. |
+| 🟨 Amarelo | **Repositories** | Padrão persistência. Abstrai como dados são salvos. |
+| 🔴 Vermelho | **Anti-Corruption Layer** | Traduz conceitos entre Bounded Contexts (desacoplamento). |
+| 🟠 Laranja claro | **DTOs** | Objetos de transferência de dados entre contextos. |
+| 🔵 Azul | **Bounded Contexts** | Limites de domínio isolados e independentes. |
+
+### Relações Principais
+
+- **Herança:** Tarefa, Usuario, Prazo e Prioridade herdam de Entity
+- **Composição:** Tarefa contém Prazo e Prioridade (Value Objects)
+- **Criação:** TarefaFactory cria novas instâncias de Tarefa
+- **Persistência:** ServicoDeConclusao usa ITarefaRepository
+- **Desacoplamento:** TarefaAdapter traduz Tarefa em TarefaVencendoDTO (ACL)
 
 ---
